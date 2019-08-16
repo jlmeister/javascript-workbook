@@ -9,9 +9,60 @@ const rl = readline.createInterface({
 
 
 function rockPaperScissors(hand1, hand2) {
+  let player1 = hand1.toLowerCase().trim();
+  let player2 = hand2.toLowerCase().trim();
 
-  // Write code here
+  // *** THIS IS ONE WAY TO DO IT ***
+  // if(player1 === player2) {
+  //   return "It's a tie!";
+  // }
+  // else if((player1 === 'rock' && player2 === 'paper') || (player1 === 'paper' && player2 === 'scissors') || (player1 === 'scissors' && player2 === 'rock')) {
+  //   return "Hand two wins!";
+  // }
+  // else if((player1 === 'paper' && player2 === 'rock') || (player1 === 'scissors' && player2 === 'paper') || (player1 === 'rock' && player2 === 'scissors')) {
+  //   return "Hand two wins!";
+  // }
+  // else return "Invalid entry. Only use rock, paper, or scissors.";
 
+
+  // *** THIS IS ANOTHER WAY TO DO IT ***
+  switch (player1) {
+    case 'rock':
+      switch(player2) {
+        case 'rock':
+          return "It's a tie!";
+        case 'paper':
+          return "Hand two wins!";
+        case 'scissors':
+          return "Hand one wins!";
+        default:
+          return "Invalid entry. Only use rock, paper, or scissors.";
+      }
+    case 'paper':
+      switch(player2) {
+        case 'rock':
+          return "Hand one wins!";
+        case 'paper':
+          return "It's a tie!";
+        case 'scissors':
+          return "Hand two wins!";
+        default:
+          return "Invalid entry. Only use rock, paper, or scissors.";
+      }
+    case 'scissors':
+      switch(player2) {
+        case 'rock':
+          return "Hand two wins!";
+        case 'paper':
+          return "Hand one wins!";
+        case 'scissors':
+          return "It's a tie!";
+        default:
+          return "Invalid entry. Only use rock, paper, or scissors.";
+      }
+    default:
+      return "Invalid entry. Only use rock, paper, or scissors.";
+  }
 }
 
 function getPrompt() {
