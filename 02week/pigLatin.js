@@ -9,9 +9,39 @@ const rl = readline.createInterface({
 
 
 function pigLatin(word) {
+  // DECLARE VARIABLES:
+  // 1. array to hold passed word
+  // 2. empty array to take the front of it,
+  // 3. and a function to test for vowels.
+  let letters = word.trim().toLowerCase().split('');
+  let front = [];
+  const isVowel = (char) => {
+    const vowels = ['a', 'e', 'i', 'o', 'u'];
+    for(let i = 0; i < vowels.length; i++) {
+      if (vowels[i] === char) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-  // Your code here
-
+  // iterate on the first letter of the word until it is a vowel, shifting it to a separate array each iteration.
+  while(!isVowel(letters[0])) {
+    front.push(letters.shift());
+  }
+  
+  // If front array is empty after the loop, then the word started with a vowel and we add 'yay' to the end.
+  // Otherwise, add 'ay' to front array, then add front to the end.
+  // Return the word translated to Pig Latin.
+  if (front.length === 0) {
+    letters.push('yay');
+    return letters.join('');
+  }
+  else {
+    front.push('ay');
+    letters.push(front.join(''));
+    return letters.join('');
+  }
 }
 
 
