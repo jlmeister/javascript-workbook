@@ -92,3 +92,37 @@ if (typeof describe === 'function') {
   getPrompt();
 
 }
+
+
+
+/* Towers of Hanoi Logic
+
+Object of the game is to move all the pieces from the first stack to the last stack.
+
+*** Rules ***
+- Can only move one piece at a time
+- Can only remove the top piece from a given stack
+- Can only place a piece on an empty stack or on a larger piece
+- The placed piece must go on top of the new stack
+
+*** Code map and pseudocode ***
+
+towersOfHanoi(startStack, endStack)
+- check to see if the entries are valid.
+- check to see if the move is valid.
+- if entries and move are valid, move the piece.
+- after moving the piece, check to see if win condition is met.
+
+isLegal()
+- check to see if the entries for startStack and endStack are 'a', 'b', or 'c'.
+- check to make sure startStack has a block to move (i.e. isn't empty)
+- if endStack is empty and startStack isn't, the move is legal. return true.
+- if endStack isn't empty, compare values of the last index of startStack and the last index of endStack.
+- if the last index of startStack is smaller than the last index of endStack, the move is legal. return true.
+- otherwise, it's invalid.
+
+movePiece()
+- already checked to see if the move is legal, so just need to pop() from startStack and push() to endStack
+
+checkForWin()
+- return true if the contents of stacks.c is equal to [4, 3, 2, 1]. */
