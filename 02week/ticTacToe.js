@@ -33,6 +33,13 @@ function gameReset() {
   turnCount = 0;
 }
 
+function changePlayer() {
+  if (playerTurn === 'X') {
+    playerTurn = 'O';
+  }
+  else playerTurn = 'X';
+}
+
 function horizontalWin() {
   for(let i = 0; i < 3; i++) {
     if (board[i][0] === board[i][1] && board[i][1] === board[i][2] && board[i][0] !== ' ') {
@@ -50,7 +57,7 @@ function verticalWin() {
 }
 
 function diagonalWin() {
-  if ((board[0][0] === board[1][1] && board[1][1] === board[2][2] && board[0][0] !== ' ') || (board[2][0] === board[1][1] === board[0][2] && board[2][0] !== ' ')) {
+  if ((board[0][0] === board[1][1] && board[1][1] === board[2][2] && board[0][0] !== ' ') || (board[2][0] === board[1][1] && board[1][1] === board[0][2] && board[2][0] !== ' ')) {
     return true;
   }
 }
@@ -62,23 +69,23 @@ function checkForWin() {
 function ticTacToe(row, column) {
   console.clear();
 
-  if (board[row][column] === ' ') {
-    turnCount++;
-    board[row][column] = playerTurn;
-    if (checkForWin() === true) {
-      console.log(`Player ${playerTurn} wins!`);
-      gameReset();
+  if (!isNaN(row) && row >= 0 && row < 3 && !isNaN(column) && column >= 0 && column < 3) {
+    if (board[row][column] === ' ') {
+      turnCount++;
+      board[row][column] = playerTurn;
+      if (checkForWin()) {
+        console.log(`Player ${playerTurn} wins!`);
+        gameReset();
+      }
+      else if (turnCount === 9) {
+        console.log("It's a tie!")
+        gameReset();
+      }
+      changePlayer();
     }
-    else if (turnCount === 9) {
-      console.log("It's a tie!")
-      gameReset();
-    }
-    if (playerTurn === 'X') {
-      playerTurn = 'O';
-    }
-    else playerTurn = 'X';
+    else console.log("Invalid move. Try again.")
   }
-  else console.log("Illegal move. Try again.");
+  else console.log("Invalid input. Try again.");
 }
 
 function getPrompt() {
