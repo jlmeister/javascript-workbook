@@ -13,6 +13,8 @@ let stacks = {
   c: []
 };
 
+const stackNames = ['a', 'b', 'c'];
+
 function printStacks() {
   console.log("a: " + stacks.a);
   console.log("b: " + stacks.b);
@@ -36,7 +38,7 @@ function isLegal(start, end) {
   // - if endStack is empty and startStack isn't, the move is legal. return true.
   // - if endStack isn't empty... if the last index of startStack is smaller than the last index of endStack, the move is legal. return true.
   // - otherwise, it's invalid.
-  if ((start === 'a' || start === 'b' || start === 'c') && (end === 'a' || end === 'b' || end === 'c')) {
+  if ((stackNames.indexOf(start) !== -1) && (stackNames.indexOf(end) !== -1)) {
     let source = stacks[start];
     let target = stacks[end];
 
