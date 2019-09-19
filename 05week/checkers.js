@@ -8,13 +8,19 @@ const rl = readline.createInterface({
 });
 
 
-function Checker() {
-  // Your code here
+function Checker(color, position) {
+  this.color = color;
+  this.position = position;
+  this.type = 'normal';
 }
 
 class Board {
   constructor() {
-    this.grid = []
+    this.grid = [];
+    this.red = 'r';
+    this.black = 'b';
+    this.checkers = [];
+    this.playerTurn = this.red;
   }
   // method that creates an 8x8 array, filled with null values
   createGrid() {
@@ -38,7 +44,7 @@ class Board {
         // if the location is "truthy" (contains a checker piece, in this case)
         if (this.grid[row][column]) {
           // push the symbol of the check in that location into the array
-          rowOfCheckers.push(this.grid[row][column].symbol);
+          rowOfCheckers.push(this.grid[row][column]);
         } else {
           // just push in a blank space
           rowOfCheckers.push(' ');
@@ -51,6 +57,24 @@ class Board {
     }
     console.log(string);
   }
+  initializeBoard() {
+    for(let row = 0; row < 3; row++) {
+      for(let col = 0; col < 8; col++) {
+        if((row + col) % 2 == 1) {
+          this.grid[row][col] = this.red;
+          this.checkers.push(this.grid[row][col]);
+        }
+      }
+    }
+    for(let row = 5; row < 8; row++) {
+      for(let col = 0; col < 8; col++) {
+        if((row + col) % 2 == 1) {
+          this.grid[row][col] = this.black;
+          this.checkers.push(this.grid[row][col]);
+        }
+      }
+    }
+  }
 
   // Your code here
 }
@@ -61,7 +85,33 @@ class Game {
   }
   start() {
     this.board.createGrid();
+    this.board.initializeBoard();
   }
+  moveChecker(from, to) {
+    let fromRow = from[0], fromCol = from[1], toRow = to[0], toCol = to[1];
+    if(this.isLegalInput(from, to)) {
+      this.board.grid[fromRow][fromCol] = null;
+  
+      if(this.board.playerTurn == this.board.red) {
+        this.board.grid[toRow][toCol] = this.board.red;
+      }
+      else if(this.board.playerTurn == this.board.black) {
+        this.board.grid[toRow][toCol] = this.board.black;
+      }
+      this.switchPlayer();
+    }
+  }
+  switchPlayer() {
+    if(this.board.playerTurn == this.board.red)
+      this.board.playerTurn = this.board.black;
+    else
+      this.board.playerTurn = this.board.red;
+  }
+  isLegalInput(from, to) {
+    let legal = /^[0-7][0-7]$/;
+    return legal.test(from) && legal.test(to);
+  }
+  isLegalMove()
 }
 
 function getPrompt() {
