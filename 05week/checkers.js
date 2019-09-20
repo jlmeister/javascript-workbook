@@ -20,7 +20,7 @@ class Board {
     this.red = 'r';
     this.black = 'b';
     this.checkers = [];
-    this.playerTurn = this.red;
+    this.playerTurn = this.black;
   } 
   // method that creates an 8x8 array, filled with null values
   createGrid() {
@@ -57,7 +57,7 @@ class Board {
     }
     console.log(string);
   }
-  initializeBoard() {
+  createCheckers() {
     for(let row = 0; row < 3; row++) {
       for(let col = 0; col < 8; col++) {
         if((row + col) % 2 == 1) {
@@ -75,8 +75,14 @@ class Board {
       }
     }
   }
+  killChecker(row, col) {
+    if(this.grid[row][col] == this.red)
+      this.checkers.shift(); // red checkers are in first half of array. remove a red checker.
+    else
+      this.checkers.pop(); // black checkers are in second half of array. remove a black checker.
 
-  // Your code here
+    this.grid[row][col] = null;
+  }
 }
 
 class Game {
@@ -85,7 +91,7 @@ class Game {
   }
   start() {
     this.board.createGrid();
-    this.board.initializeBoard();
+    this.board.createCheckers();
   }
   moveChecker(from, to) {
     const rowFrom = from.charAt(0);
@@ -95,18 +101,29 @@ class Game {
     let gameBoard = this.board.grid;
 
     if(this.isLegalInput(from, to)) {
-      console.log(this.moveType(from, to));
-      // {
-      //   gameBoard[rowFrom][colFrom] = null;
-      //   gameBoard[toRow][toCol] = this.board.playerTurn;
-      //   this.switchPlayer();
-      // }
+      switch(this.moveType(from, to)) {
+        case 'normal':
+          gameBoard[rowFrom][colFrom] = null;
+          gameBoard[toRow][toCol] = this.board.playerTurn;
+          this.switchPlayer();
+          break;
+        case 'jump':
+          let over = ((Number(from) + Number(to)) / 2).toString().split('');
+          gameBoard[rowFrom][colFrom] = null;
+          gameBoard[toRow][toCol] = this.board.playerTurn;
+          this.board.killChecker(over[0], over[1]);
+          this.switchPlayer();
+          break;
+        case 'illegal':
+          console.log("Try again.");
+          break;
+      }
     }
     else console.log("invalid input.");
   }
   switchPlayer() {
-    let red = this.board.red.toLowerCase();
-    let black = this.board.black.toLowerCase();
+    let red = this.board.red;
+    let black = this.board.black;
 
     if(this.board.playerTurn == red)
       this.board.playerTurn = black;
@@ -125,12 +142,13 @@ class Game {
     const toCol = to.charAt(1);
     let wantToJump = this.board.grid;
     let distance = from - to;
+    let moveType = 'illegal';
 
     if(wantToJump[fromRow][fromCol] == this.board.playerTurn) {
       if(!wantToJump[toRow][toCol]) {
         if((this.board.playerTurn == this.board.red && distance < 0) || (this.board.playerTurn == this.board.black && distance > 0)) {
           if(Math.abs(distance) == 9 || Math.abs(distance) == 11) {
-            return 'normal';
+            moveType = 'normal';
           }
           else if(Math.abs(distance) == 18 || Math.abs(distance) == 22) {
             let over = ((Number(from) + Number(to)) / 2).toString().split('');
@@ -142,7 +160,7 @@ class Game {
                 console.log("Can't jump over your own pieces.");
                 break;
               default:
-                return 'jump';
+                moveType = 'jump';
             }
           }
           else
@@ -157,52 +175,7 @@ class Game {
     else {
       console.log("Choose one of your own pieces to move.");
     }
-
-    return 'illegal';
-
-
-
-    // Legal Move Tests:
-    // 1. Does the location of the "from" location (first input) contain a piece, and does it match the current player's turn?
-    // if(wantToJump[fromRow][fromCol] != this.board.playerTurn) {
-    //   console.log("Choose one of your own pieces to move.");
-    //   return false;
-    // }
-    // // 2. Is the location of the "to" location (second input) empty?
-    // if(wantToJump[toRow][toCol]) {
-    //   console.log("There's a piece there already.")
-    //   return false;
-    // }
-    // // 3. Is the move in the right direction?
-    // if((this.board.playerTurn == this.board.red && distance > 0) || (this.board.playerTurn == this.board.black && distance < 0)) {
-    //   console.log("Wrong direction.");
-    //   return false;
-    // }
-    // // 4. Is the difference between the two locations a multiple of 9 or 11? (i.e. is it a diagonal move?)
-    // if(Math.abs(distance) % 9 != 0 && Math.abs(distance) % 11 != 0) {
-    //   console.log("Illegal move. That's not diagonal, silly!")
-    //   return false;
-    // }
-    // // 5. Are you trying to move more than two diagonal 
-    // // 4. If not moving to an adjacent diagonal square, is the destination two squares away, and is there an opposing piece in the middle? (i.e. are you jumping over another piece?)
-    // if(Math.abs(distance) == 18 || Math.abs(distance) == 22) {
-    //   let over = ((Number(from) + Number(to)) / 2).toString().split('');
-    //   console.log(wantToJump[over[0]][over[1]]);
-    //   if(!wantToJump[over[0]][over[1]]) {
-    //     console.log("One space at a time...");
-    //     return false;
-    //   }
-    //   if(wantToMove[over[0]][over[1]] == this.board.playerTurn) {
-    //     console.log("You can only jump over opposing pieces.");
-    //     return false;
-    //   }
-    // }
-    
-
-
-    // // if(legal === true)
-    //   // console.log('Good job, genius... 🙄');
-    // return true;
+    return moveType;
   }
 }
 
