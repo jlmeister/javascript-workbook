@@ -8,10 +8,10 @@ const rl = readline.createInterface({
 });
 
 
-function Checker(color, position) {
+function Checker(color) {
   this.color = color;
-  this.position = position;
-  this.type = 'normal';
+  // this.position = position.toString().split('');
+  this.isKing = false;
 }
 
 class Board {
@@ -21,7 +21,7 @@ class Board {
     this.black = 'b';
     this.checkers = [];
     this.playerTurn = this.red;
-  }
+  } 
   // method that creates an 8x8 array, filled with null values
   createGrid() {
     // loop to create the 8 rows
@@ -95,11 +95,12 @@ class Game {
     let gameBoard = this.board.grid;
 
     if(this.isLegalInput(from, to)) {
-      if(this.isLegalMove(from, to)) {
-        gameBoard[rowFrom][colFrom] = null;
-        gameBoard[toRow][toCol] = this.board.playerTurn;
-        this.switchPlayer();
-      }
+      console.log(this.moveType(from, to));
+      // {
+      //   gameBoard[rowFrom][colFrom] = null;
+      //   gameBoard[toRow][toCol] = this.board.playerTurn;
+      //   this.switchPlayer();
+      // }
     }
     else console.log("invalid input.");
   }
@@ -117,51 +118,91 @@ class Game {
     let legal = /^[0-7][0-7]$/;
     return legal.test(from) && legal.test(to);
   }
-  isLegalMove(from, to) {
+  moveType(from, to) {
     const fromRow = from.charAt(0);
     const fromCol = from.charAt(1);
     const toRow = to.charAt(0);
     const toCol = to.charAt(1);
-    let wantToMove = this.board.grid;
+    let wantToJump = this.board.grid;
     let distance = from - to;
-    // let legal = true;
- 
+
+    if(wantToJump[fromRow][fromCol] == this.board.playerTurn) {
+      if(!wantToJump[toRow][toCol]) {
+        if((this.board.playerTurn == this.board.red && distance < 0) || (this.board.playerTurn == this.board.black && distance > 0)) {
+          if(Math.abs(distance) == 9 || Math.abs(distance) == 11) {
+            return 'normal';
+          }
+          else if(Math.abs(distance) == 18 || Math.abs(distance) == 22) {
+            let over = ((Number(from) + Number(to)) / 2).toString().split('');
+            switch(wantToJump[over[0]][over[1]]) {
+              case null:
+                console.log("Can't jump over an empty space.");
+                break;
+              case this.board.playerTurn:
+                console.log("Can't jump over your own pieces.");
+                break;
+              default:
+                return 'jump';
+            }
+          }
+          else
+            console.log("Illegal Move.");
+        }
+        else
+          console.log("You can't move backwards, silly!");
+      }
+      else
+        console.log("There's already a piece there.");
+    }
+    else {
+      console.log("Choose one of your own pieces to move.");
+    }
+
+    return 'illegal';
+
+
+
     // Legal Move Tests:
     // 1. Does the location of the "from" location (first input) contain a piece, and does it match the current player's turn?
-    if(wantToMove[fromRow][fromCol] != this.board.playerTurn) {
-      console.log("Choose one of your own pieces to move.");
-      return false;
-    }
-    // 2. Is the location of the "to" location (second input) empty?
-    if(wantToMove[toRow][toCol]) {
-      console.log("There's a piece there already.")
-      return false;
-    }
-    // 3. Is the move in the right direction?
-    if((this.board.playerTurn == this.board.red && distance > 0) || (this.board.playerTurn == this.board.black && distance < 0)) {
-      console.log("Wrong direction.");
-      return false;
-    }
-    // 4. Is the difference between the two locations a multiple of 9 or 11? (i.e. is it a diagonal move?)
-    if(Math.abs(distance) % 9 != 0 && Math.abs(distance) % 11 != 0) {
-      console.log("Illegal move. That's not diagonal, silly!")
-      return false;
-    }
-    // 4. If not moving to an adjacent diagonal square, is the destination two squares away, and is there an opposing piece in the middle? (i.e. are you jumping over another piece?)
-    if(Math.abs(distance) == 18 || Math.abs(distance) == 22) {
-      let middle = ((Number(from) + Number(to)) / 2).toString().split('');
-      console.log(wantToMove[middle[0]][middle[1]]);
-      if(!wantToMove[middle[0]][middle[1]]) {
-        console.log("One at a time...");
-        return false;
-      }
-    }
+    // if(wantToJump[fromRow][fromCol] != this.board.playerTurn) {
+    //   console.log("Choose one of your own pieces to move.");
+    //   return false;
+    // }
+    // // 2. Is the location of the "to" location (second input) empty?
+    // if(wantToJump[toRow][toCol]) {
+    //   console.log("There's a piece there already.")
+    //   return false;
+    // }
+    // // 3. Is the move in the right direction?
+    // if((this.board.playerTurn == this.board.red && distance > 0) || (this.board.playerTurn == this.board.black && distance < 0)) {
+    //   console.log("Wrong direction.");
+    //   return false;
+    // }
+    // // 4. Is the difference between the two locations a multiple of 9 or 11? (i.e. is it a diagonal move?)
+    // if(Math.abs(distance) % 9 != 0 && Math.abs(distance) % 11 != 0) {
+    //   console.log("Illegal move. That's not diagonal, silly!")
+    //   return false;
+    // }
+    // // 5. Are you trying to move more than two diagonal 
+    // // 4. If not moving to an adjacent diagonal square, is the destination two squares away, and is there an opposing piece in the middle? (i.e. are you jumping over another piece?)
+    // if(Math.abs(distance) == 18 || Math.abs(distance) == 22) {
+    //   let over = ((Number(from) + Number(to)) / 2).toString().split('');
+    //   console.log(wantToJump[over[0]][over[1]]);
+    //   if(!wantToJump[over[0]][over[1]]) {
+    //     console.log("One space at a time...");
+    //     return false;
+    //   }
+    //   if(wantToMove[over[0]][over[1]] == this.board.playerTurn) {
+    //     console.log("You can only jump over opposing pieces.");
+    //     return false;
+    //   }
+    // }
     
 
 
-    // if(legal === true)
-      // console.log('Good job, genius... 🙄');
-    return true;
+    // // if(legal === true)
+    //   // console.log('Good job, genius... 🙄');
+    // return true;
   }
 }
 
