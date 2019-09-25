@@ -8,19 +8,21 @@ const rl = readline.createInterface({
 });
 
 
-function Checker(color) {
-  this.color = color;
-  // this.position = position.toString().split('');
-  this.isKing = false;
+class Checker {
+  constructor(color) {
+    this.symbol = color == 'r' ? 'r' : 'b';
+    this.isKing = false;
+  }
+  kingMe() {
+    this.isKing = true;
+    this.symbol = this.symbol.toUpperCase();
+  }
 }
 
 class Board {
   constructor() {
     this.grid = [];
-    this.red = 'r';
-    this.black = 'b';
     this.checkers = [];
-    this.playerTurn = this.black;
   } 
   // method that creates an 8x8 array, filled with null values
   createGrid() {
@@ -44,7 +46,7 @@ class Board {
         // if the location is "truthy" (contains a checker piece, in this case)
         if (this.grid[row][column]) {
           // push the symbol of the check in that location into the array
-          rowOfCheckers.push(this.grid[row][column]);
+          rowOfCheckers.push(this.grid[row][column].symbol);
         } else {
           // just push in a blank space
           rowOfCheckers.push(' ');
@@ -61,7 +63,8 @@ class Board {
     for(let row = 0; row < 3; row++) {
       for(let col = 0; col < 8; col++) {
         if((row + col) % 2 == 1) {
-          this.grid[row][col] = this.red;
+          const checker = new Checker('r');
+          this.grid[row][col] = checker;
           this.checkers.push(this.grid[row][col]);
         }
       }
@@ -69,14 +72,19 @@ class Board {
     for(let row = 5; row < 8; row++) {
       for(let col = 0; col < 8; col++) {
         if((row + col) % 2 == 1) {
-          this.grid[row][col] = this.black;
+          const checker = new Checker('b');
+          this.grid[row][col] = checker;
           this.checkers.push(this.grid[row][col]);
         }
       }
     }
   }
+  selectChecker(row, col) {
+    return this.grid[row][col];
+  }
   killChecker(row, col) {
-    if(this.grid[row][col] == this.red)
+    const checker = this.grid[row][col];
+    if(checker.symbol.toUpperCase() == 'R')
       this.checkers.shift(); // red checkers are in first half of array. remove a red checker.
     else
       this.checkers.pop(); // black checkers are in second half of array. remove a black checker.
@@ -88,51 +96,58 @@ class Board {
 class Game {
   constructor() {
     this.board = new Board;
+    this.redPlayer = 'r';
+    this.blackPlayer = 'b';
+    this.playerTurn = this.blackPlayer;
   }
   start() {
     this.board.createGrid();
     this.board.createCheckers();
   }
   moveChecker(from, to) {
-    const rowFrom = from.charAt(0);
-    const colFrom = from.charAt(1);
-    const toRow = to.charAt(0);
-    const toCol = to.charAt(1);
-    let gameBoard = this.board.grid;
-
+    const gameBoard = this.board.grid;
+    
     if(this.isLegalInput(from, to)) {
-      switch(this.moveType(from, to)) {
+      const rowFrom = from.charAt(0), colFrom = from.charAt(1), toRow = to.charAt(0), toCol = to.charAt(1);
+      const checker = this.board.selectChecker(rowFrom, colFrom);
+      const moveMessage = this.moveType(from, to);
+      
+      switch(moveMessage) {
         case 'normal':
+          gameBoard[toRow][toCol] = checker;
           gameBoard[rowFrom][colFrom] = null;
-          gameBoard[toRow][toCol] = this.board.playerTurn;
+          if((this.playerTurn == this.redPlayer && toRow == 7) || (this.playerTurn == this.blackPlayer && toRow == 0))
+            checker.kingMe();
           this.switchPlayer();
           break;
         case 'jump':
-          let over = ((Number(from) + Number(to)) / 2).toString().split('');
+          const over = ((Number(from) + Number(to)) / 2).toString();
+          gameBoard[toRow][toCol] = checker;
           gameBoard[rowFrom][colFrom] = null;
-          gameBoard[toRow][toCol] = this.board.playerTurn;
-          this.board.killChecker(over[0], over[1]);
+          this.board.killChecker(over.charAt(0), over.charAt(1));
+          if((this.playerTurn == this.redPlayer && toRow == 7) || (this.playerTurn == this.blackPlayer && toRow == 0))
+          checker.kingMe();
+          
+          const jumpAgain = this.findAnotherJump(to);
+          if(jumpAgain) {
+            const newFrom = to, newTo = jumpAgain;
+            this.moveChecker(newFrom, newTo);
+          }
           this.switchPlayer();
           break;
-        case 'illegal':
-          console.log("Try again.");
+        default:
+          console.log(moveMessage);
           break;
       }
     }
     else console.log("invalid input.");
   }
   switchPlayer() {
-    let red = this.board.red;
-    let black = this.board.black;
-
-    if(this.board.playerTurn == red)
-      this.board.playerTurn = black;
-    else
-      this.board.playerTurn = red;
+    this.playerTurn = this.playerTurn == this.redPlayer ? this.blackPlayer : this.redPlayer;
   }
   isLegalInput(from, to) {
     // test each input to see that they are only two digits between 0 and 7.
-    let legal = /^[0-7][0-7]$/;
+    const legal = /^[0-7][0-7]$/;
     return legal.test(from) && legal.test(to);
   }
   moveType(from, to) {
@@ -140,48 +155,87 @@ class Game {
     const fromCol = from.charAt(1);
     const toRow = to.charAt(0);
     const toCol = to.charAt(1);
-    let wantToJump = this.board.grid;
-    let distance = from - to;
+    const wantToJump = this.board.grid;
+    const distance = from - to;
     let moveType = 'illegal';
 
-    if(wantToJump[fromRow][fromCol] == this.board.playerTurn) {
+    if(wantToJump[fromRow][fromCol] && wantToJump[fromRow][fromCol].symbol.toUpperCase() == this.playerTurn.toUpperCase()) {
       if(!wantToJump[toRow][toCol]) {
-        if((this.board.playerTurn == this.board.red && distance < 0) || (this.board.playerTurn == this.board.black && distance > 0)) {
+        if(((this.playerTurn == this.redPlayer && distance < 0) || (this.playerTurn == 'b' && distance > 0)) && !wantToJump[fromRow][fromCol].isKing) {
           if(Math.abs(distance) == 9 || Math.abs(distance) == 11) {
             moveType = 'normal';
           }
           else if(Math.abs(distance) == 18 || Math.abs(distance) == 22) {
-            let over = ((Number(from) + Number(to)) / 2).toString().split('');
-            switch(wantToJump[over[0]][over[1]]) {
-              case null:
-                console.log("Can't jump over an empty space.");
-                break;
-              case this.board.playerTurn:
-                console.log("Can't jump over your own pieces.");
-                break;
-              default:
-                moveType = 'jump';
-            }
+            const over = ((Number(from) + Number(to)) / 2).toString().split('');
+            if(!wantToJump[over[0]][over[1]])
+              moveType = "Can't jump over an empty space.";
+            else if (wantToJump[over[0]][over[1]].symbol == this.playerTurn)
+              moveType = "Can't jump over your own pieces.";
+            else
+              moveType = 'jump';
           }
           else
-            console.log("Illegal Move.");
+            moveType = "Illegal Move.";
+        }
+        else if(wantToJump[fromRow][fromCol].isKing) {
+          if(Math.abs(distance) == 9 || Math.abs(distance) == 11) {
+            moveType = 'normal';
+          }
+          else if(Math.abs(distance) == 18 || Math.abs(distance) == 22) {
+            const over = ((Number(from) + Number(to)) / 2).toString().split('');
+            if(!wantToJump[over[0]][over[1]])
+              moveType = "Can't jump over an empty space.";
+            else if (wantToJump[over[0]][over[1]].symbol == this.playerTurn)
+              moveType = "Can't jump over your own pieces.";
+            else
+              moveType = 'jump';
+          }
+          else
+            moveType = "Illegal Move.";
         }
         else
-          console.log("You can't move backwards, silly!");
+          moveType = "You can't move backwards, silly!";
       }
       else
-        console.log("There's already a piece there.");
+        moveType = "There's already a piece there.";
     }
     else {
-      console.log("Choose one of your own pieces to move.");
+      moveType = "Choose one of your own pieces to move.";
     }
+
     return moveType;
+  }
+  findAnotherJump(position) {
+    const checker = this.board.selectChecker(position.charAt(0), position.charAt(1));
+    const jumpDirection = [-22, -18, 18, 22];
+    let foundJump = null;
+
+    if(checker.isKing || this.playerTurn == this.blackPlayer) {
+      for(let i = 0; i < 2; i++) {
+        const testJumpPosition = Number(position) + jumpDirection[i];
+        if(testJumpPosition >= 10 && this.moveType(position, testJumpPosition.toString()) == 'jump')
+          foundJump = testJumpPosition;
+        else if(testJumpPosition > 0 && this.moveType(position, '0'.concat(testJumpPosition.toString())) == 'jump')
+          foundJump = '0'.concat(testJumpPosition.toString());
+      }
+    }
+    if(checker.isKing || this.playerTurn == this.redPlayer) {
+      for(let j = 2; j < 4; j++) {
+        const testJumpPosition = Number(position) + jumpDirection[j];
+        if(testJumpPosition < 77 && this.moveType(position, testJumpPosition.toString()) == 'jump')
+          foundJump = testJumpPosition;
+      }
+    }
+    if(foundJump != null)
+      return foundJump.toString();
+    else
+      return foundJump;
   }
 }
 
 function getPrompt() {
   game.board.viewGrid();
-  console.log(game.board.playerTurn);
+  console.log(game.playerTurn);
   rl.question('which piece?: ', (whichPiece) => {
     rl.question('to where?: ', (toWhere) => {
       game.moveChecker(whichPiece, toWhere);
