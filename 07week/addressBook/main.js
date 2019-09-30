@@ -23,13 +23,12 @@ const displayUsers = () => {
     const moreText = document.createElement('pre');
     const img = document.createElement('img');
     img.src = user.picture.large;
-    btn.innerHTML = 'more info';
+    btn.innerHTML = 'MORE INFO';
+    li.appendChild(img);
+    li.appendChild(document.createElement('br'));
     li.appendChild(text);
     li.appendChild(document.createElement('br'));
     li.appendChild(moreText);
-    li.appendChild(document.createElement('br'));
-    li.appendChild(img);
-    li.appendChild(document.createElement('br'));
     li.appendChild(btn);
 
     btn.onclick = () => {
@@ -40,11 +39,11 @@ const displayUsers = () => {
 
       if(!moreText.innerHTML.length) {
         moreText.innerHTML = `${email}\n${phone}\n${age}\n${dob}`;
-        btn.innerHTML = 'show less';
+        btn.innerHTML = 'SHOW LESS';
       }
       else {
         moreText.innerHTML = '';
-        btn.innerHTML = 'more info';
+        btn.innerHTML = 'MORE INFO';
       }
     };
 
