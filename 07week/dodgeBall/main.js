@@ -107,9 +107,13 @@ class Person {
 class Player extends Person {
   constructor(id, name, gender, age, skillSet, placeBorn){
     super(id, name, gender, age, skillSet, placeBorn);
-    this.canThrow = true;
-    this.canDodge = true;
     this.yearsExperience = Math.floor(this.age / 2) % 7 + 1;
+    this.canThrow = Math.floor(Math.random() * 100) / 10 + this.yearsExperience / 2;
+    if(this.canThrow > 10)
+      this.canThrow = 10;
+    this.canDodge = Math.floor(Math.random() * 100) / 10 + this.yearsExperience / 2;
+    if(this.canDodge > 10)
+      this.canDodge = 10;
   }
   joinBlueTeam() {
     const playerIndex = this.getPlayerIndex();
@@ -179,10 +183,13 @@ const showPeople = () => {
     arrOfPeople.map(person => {
       const li = document.createElement("li")
       const button = document.createElement("button")
+      const pre = document.createElement("pre");
+      pre.innerHTML = `${person.name}\nage: ${person.age}\nhobby: ${person.skillSet}`;
       button.innerHTML = "Make Player"
       button.addEventListener('click', () => person.makePlayer())
+      li.appendChild(pre)
+      // li.appendChild(document.createTextNode(person.name + " - age " + person.age + ' - ' + person.skillSet))
       li.appendChild(button)
-      li.appendChild(document.createTextNode(person.name + " - age " + person.age + ' - ' + person.skillSet))
       listElement.append(li)
     });
   }
@@ -194,6 +201,8 @@ const showPlayers = () => {
     listElement.innerHTML = '';
     listOfPlayers.map(player => {
       const li = document.createElement("li")
+      const pre = document.createElement("pre");
+      pre.innerHTML = `${player.name}\nexperience: ${player.yearsExperience} years\nthrow rating: ${player.canThrow}\ndodge rating: ${player.canDodge}\nborn: ${player.placeBorn}`;
       const blueButton = document.createElement("button")
       const redButton = document.createElement("button")
       const leaveButton = document.createElement("button")
@@ -203,7 +212,7 @@ const showPlayers = () => {
       blueButton.addEventListener('click', () => player.joinBlueTeam())
       redButton.addEventListener('click', () => player.joinRedTeam())
       leaveButton.addEventListener('click', () => player.leaveLeague())
-      li.appendChild(document.createTextNode(player.name + " - " + player.yearsExperience + " years experience"))
+      li.appendChild(pre)
       li.appendChild(blueButton)
       li.appendChild(redButton)
       li.appendChild(leaveButton)
@@ -218,10 +227,12 @@ const showBlueTeam = () => {
     listElement.innerHTML = '';
     blueTeam.map(player => {
       const li = document.createElement("li")
+      const pre = document.createElement("pre");
+      pre.innerHTML = `${player.name}\nage: ${player.age}\nborn: ${player.placeBorn}`;
       const button = document.createElement("button")
       button.innerHTML = "Leave Team"
       button.addEventListener('click', () => player.leaveTeam())
-      li.appendChild(document.createTextNode(player.name + " - " + player.placeBorn))
+      li.appendChild(pre)
       li.appendChild(button)
       listElement.append(li)
     })
@@ -234,10 +245,12 @@ const showRedTeam = () => {
     listElement.innerHTML = '';
     redTeam.map(player => {
       const li = document.createElement("li")
+      const pre = document.createElement("pre");
+      pre.innerHTML = `${player.name}\nage: ${player.age}\nborn: ${player.placeBorn}`;
       const button = document.createElement("button")
       button.innerHTML = "Leave Team"
       button.addEventListener('click', () => player.leaveTeam())
-      li.appendChild(document.createTextNode(player.name + " - " + player.placeBorn))
+      li.appendChild(pre)
       li.appendChild(button)
       listElement.append(li)
     })
