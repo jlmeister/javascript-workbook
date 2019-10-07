@@ -65,6 +65,6 @@ const showPokemon = () => {
                 <pre>Type: ${myPoke.type1}\nMoves: ${myPoke.move1}\n${myPoke.move2}\n${myPoke.move3}\n${myPoke.move4}</pre>`;
   let div = document.getElementById('show');
   div.innerHTML = result;
-  document.body.appendChild(div);
+  // document.body.appendChild(div);
 }
 // {  “moves”: [0: { “move”: { “name” } }, 1, 2, 3], “name”, “sprites”: { “back_default”, “front default” }, “types”: [0: { “type”: { “name” } }, 1]

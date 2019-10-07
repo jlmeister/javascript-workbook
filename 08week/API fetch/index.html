@@ -8,11 +8,19 @@
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <button onclick="getPokemon()">Choose Random</button>
-  <label for="pokemon">Pokemon name or ID#</label>
-  <input type="text" name="pokemon">
-  <button type="submit" id="find-pokemon">Submit</button>
-  <div id="show"></div>
+  <header>Pokedex</header>
+  <main>
+    <button onclick="getPokemon()">Choose Random</button>
+    <div>OR</div>
+    <div>
+      <label for="pokemon">Pokemon name or ID#</label>
+      <input type="text" name="pokemon">
+      <button type="submit" id="find-pokemon">Submit</button>
+    </div>
+    <div id="show-wrapper">
+      <div id="show"></div>
+    </div>
+  </main>
   <script src="./main.js"></script>
 </body>
 </html>
