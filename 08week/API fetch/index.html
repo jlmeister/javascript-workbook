@@ -1,0 +1,26 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Pokedex</title>
+  <link rel="stylesheet" href="./src/pokemon-font.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header>Pokedex</header>
+  <main>
+    <button onclick="getPokemon()">Choose Random</button>
+    <div>OR</div>
+    <div>
+      <label for="pokemon">Pokemon name or ID#</label>
+      <input type="text" name="pokemon">
+      <button type="submit" id="find-pokemon">Submit</button>
+    </div>
+    <div id="show-wrapper">
+      <div id="show"></div>
+    </div>
+  </main>
+  <script src="./main.js"></script>
+</body>
+</html>
