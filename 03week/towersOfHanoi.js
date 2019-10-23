@@ -13,30 +13,69 @@ let stacks = {
   c: []
 };
 
+const stackNames = ['a', 'b', 'c'];
+
 function printStacks() {
   console.log("a: " + stacks.a);
   console.log("b: " + stacks.b);
   console.log("c: " + stacks.c);
 }
 
-function movePiece() {
-  // Your code here
-
+function resetStacks() {
+  stacks.a = [4, 3, 2, 1];
+  stacks.b = [];
+  stacks.c = [];
 }
 
-function isLegal() {
-  // Your code here
+function movePiece(start, end) {
+  stacks[end].push(stacks[start].pop());
+}
 
+function isLegal(start, end) {
+  // isLegal()
+  // - check to see if the entries for startStack and endStack are 'a', 'b', or 'c'. If not, invalid entry.
+  // - check to make sure startStack has a block to move (i.e. isn't empty). If not, let the user know there is no block there.
+  // - if endStack is empty and startStack isn't, the move is legal. return true.
+  // - if endStack isn't empty... if the last index of startStack is smaller than the last index of endStack, the move is legal. return true.
+  // - otherwise, it's invalid.
+  if ((stackNames.indexOf(start) !== -1) && (stackNames.indexOf(end) !== -1)) {
+    let source = stacks[start];
+    let target = stacks[end];
+
+    if (source.length > 0) {
+      if (target.length === 0)
+        return true;
+      else if (source[source.length-1] < target[target.length-1])
+        return true;
+      else {
+        console.log("Illegal move. Try again.");
+        return false;
+      }
+    }
+    else {
+      console.log(`There is no block in stack ${start}. Try again.`);
+      return false;
+    }
+  }
+  else {
+    console.log("Invalid entry. Try again.");
+    return false;
+  }
 }
 
 function checkForWin() {
-  // Your code here
-
+  return stacks.c.join('') === '4321' || stacks.b.join('') === '4321';
 }
 
 function towersOfHanoi(startStack, endStack) {
-  // Your code here
-
+  console.clear();
+  if(isLegal(startStack, endStack)) {
+    movePiece(startStack, endStack);
+    if(checkForWin()) {
+      console.log("You win!")
+      resetStacks();
+    }
+  }
 }
 
 function getPrompt() {
@@ -92,3 +131,37 @@ if (typeof describe === 'function') {
   getPrompt();
 
 }
+
+
+
+/* Towers of Hanoi Logic
+
+Object of the game is to move all the pieces from the first stack to another stack.
+
+*** Rules ***
+- Can only move one piece at a time
+- Can only remove the top piece from a given stack
+- Can only place a piece on an empty stack or on a larger piece
+- The placed piece must go on top of the new stack
+
+*** Code map and pseudocode ***
+
+towersOfHanoi(startStack, endStack)
+- check to see if the entries are valid.
+- check to see if the move is valid.
+- if entries and move are valid, move the piece.
+- after moving the piece, check to see if win condition is met.
+
+isLegal()
+- check to see if the entries for startStack and endStack are 'a', 'b', or 'c'.
+- check to make sure startStack has a block to move (i.e. isn't empty)
+- if endStack is empty and startStack isn't, the move is legal. return true.
+- if endStack isn't empty, compare values of the last index of startStack and the last index of endStack.
+- if the last index of startStack is smaller than the last index of endStack, the move is legal. return true.
+- otherwise, it's invalid.
+
+movePiece()
+- already checked to see if the move is legal, so just need to pop() from startStack and push() to endStack
+
+checkForWin()
+- return true if the contents of stacks.c is equal to [4, 3, 2, 1]. */
